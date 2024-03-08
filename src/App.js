@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import normalImage from "./assets/images/lion.jpeg";
+import Layout from "./Layout";
 import aiImage from "./assets/images/bot2.jpeg";
 
 const App = () => {
   const [prompt, setPrompt] = useState("");
   const [image, setImage] = useState("");
 
-  const OPEN_AI_API_KEY = "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";
+  const OPEN_AI_API_KEY = "";
   const fetchAndSendImage = async () => {
     try {
       const options = {
@@ -51,20 +52,21 @@ const App = () => {
   };
 
   return (
-    <div>
-      <h1>OpenAI GPT-3</h1>
-      <label htmlFor="promptInput">Enter your prompt here: </label>
-      <input
-        type="text"
-        id="promptInput"
-        onChange={(e) => setPrompt(e.target.value)}
-      />
-      <button onClick={fetchAndSendImage}>Fetch Images</button>
-      <div className="flex">
-        <img src={normalImage} alt="OG Image" />
-        <img src={image} alt="Generated Image" />
+    <Layout>
+      <div className="flex justify-center items-center text-white">
+        <label htmlFor="promptInput">Enter your prompt here: </label>
+        <input
+          type="text"
+          id="promptInput"
+          onChange={(e) => setPrompt(e.target.value)}
+        />
+        <button onClick={fetchAndSendImage}>Fetch Images</button>
+        <div className="flex">
+          <img src={normalImage} alt="OG Image" />
+          <img src={image} alt="Generated Image" />
+        </div>
       </div>
-    </div>
+    </Layout>
   );
 };
 
