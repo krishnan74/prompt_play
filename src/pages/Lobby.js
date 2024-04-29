@@ -9,7 +9,8 @@ const Lobby = () => {
   const [image, setImage] = useState("");
 
   const OPEN_AI_API_KEY = "";
-  const fetchAndSendImage = async () => {
+
+  const createAIImage = async () => {
     try {
       const options = {
         method: "POST",
@@ -28,6 +29,7 @@ const Lobby = () => {
         "https://api.openai.com/v1/images/generations",
         options
       );
+
       const data = await response.json();
       const generatedImageBase64 = data.data[0].b64_json;
       setImage(`data:image/jpeg;base64,${generatedImageBase64}`);
@@ -47,6 +49,27 @@ const Lobby = () => {
 
       const serverData = await serverResponse.json();
       console.log(serverData);
+    } catch (error) {
+      console.error("error:" + error);
+    }
+  };
+
+  const sendAiImageToServer = async () => {
+    try {
+      const options = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          prompt: prompt,
+          image: image,
+        }),
+      };
+
+      const response = await fetch("http://localhost:5000/sendImage", options);
+      const data = await response.json();
+      console.log(data);
     } catch (error) {
       console.error("error:" + error);
     }
@@ -110,6 +133,7 @@ const Lobby = () => {
               placeholder="Enter the prompt"
               className="border border-black py-2 w-[50%] rounded-lg mt-5 text-black px-4 min-w-[300px]"
             />
+            <button onClick={sendAiImageToServer}>Submit</button>
           </div>
         </div>
       </div>
