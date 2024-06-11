@@ -1,12 +1,35 @@
-import React from "react";
+import React, { useEffect } from "react";
 import PlayerScoreCard from "../components/PlayerScoreCard";
 import Layout from "../Layout";
 import { useState } from "react";
 import normalImage from "../assets/images/bot1.jpeg";
+import { useLocation } from "react-router-dom";
 
 const Lobby = () => {
   const [prompt, setPrompt] = useState("");
   const [image, setImage] = useState("");
+  const [players, setPlayers] = useState([]);
+
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const lobbyId = searchParams.get("lobbyId");
+
+  useEffect(() => {
+    getParitcipants();
+  }, []);
+
+  const getParitcipants = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/getParitcipants?lobbyId=${lobbyId}`
+      );
+      const data = await response.json();
+      setPlayers(data);
+      console.log(data);
+    } catch (error) {
+      console.error("error:" + error);
+    }
+  };
 
   const OPEN_AI_API_KEY = "";
 
@@ -75,28 +98,6 @@ const Lobby = () => {
     }
   };
 
-  const players = [
-    {
-      name: "Player 1",
-      score: 0,
-      image: "https://randomuser.me/api/portraits",
-    },
-    {
-      name: "Player 2",
-      score: 0,
-      image: "https://randomuser.me/api/portraits",
-    },
-    {
-      name: "Player 3",
-      score: 0,
-      image: "https://randomuser.me/api/portraits",
-    },
-    {
-      name: "Player 4",
-      score: 0,
-      image: "https://randomuser.me/api/portraits",
-    },
-  ];
   return (
     <Layout>
       <div className="flex flex-col text-white">
@@ -112,9 +113,10 @@ const Lobby = () => {
             {players.map((player) => {
               return (
                 <PlayerScoreCard
-                  name={player.name}
+                  name={player.playerName}
                   score={player.score}
-                  image={player.image}
+                  hatNumber={player.hatNumber}
+                  faceNumber={player.faceNumber}
                 />
               );
             })}
