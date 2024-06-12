@@ -3,6 +3,8 @@ import PlayerScoreCard from "../components/PlayerScoreCard";
 import Layout from "../Layout";
 import { useState } from "react";
 import normalImage from "../assets/images/bot1.jpeg";
+import { BsCopy } from "react-icons/bs";
+
 import { useLocation } from "react-router-dom";
 
 const Lobby = () => {
@@ -16,7 +18,17 @@ const Lobby = () => {
 
   useEffect(() => {
     getParitcipants();
+    getRandomImage();
   }, []);
+
+  const getRandomImage = async () => {
+    const randomNumber = Math.floor(Math.random() * (500 - 1) + 1);
+    const randomImage = await fetch(
+      `https://picsum.photos/id/${randomNumber}/200/300`
+    );
+    console.log(randomImage.url);
+    setImage(randomImage.url);
+  };
 
   const getParitcipants = async () => {
     try {
@@ -103,13 +115,20 @@ const Lobby = () => {
       <div className="flex flex-col text-white">
         <div className="flex justify-center items-center gap-x-3 mb-4">
           <h1 className="text-5xl font-bold tracking-wide font-['Teko']  text-center stroke-[#FFD700] ">
-            Lobby
+            Lobby Code
           </h1>
-          <p className="text-xl">#F98As09d8a</p>
+          <p className="text-xl">#{lobbyId}</p>
+          <button onClick={() => navigator.clipboard.writeText(lobbyId)}>
+            <BsCopy />
+          </button>
         </div>
 
-        <div className="flex h-[70vh] flex-wrap justify-center gap-10">
-          <div className="w-[25%] border border-white h-full flex flex-col min-w-[300px] p-10">
+        <div className="flex h-[75vh] flex-wrap justify-center gap-10">
+          <div
+            className="w-[25%] border border-white h-full flex flex-col min-w-[300px] p-10
+           overflow-y-auto gap-5
+          "
+          >
             {players.map((player) => {
               return (
                 <PlayerScoreCard

@@ -4,19 +4,19 @@ import { faceImages } from "../utils/images";
 
 const PlayerScoreCard = (props) => {
   return (
-    <div className="flex gap-3 text-white items-end justify-center">
-      <div className="w-1/2 relative flex flex-col justify-center items-center">
+    <div className="flex  text-white items-center justify-center  border border-white py-7 rounded-md bg-[rgba(255,255,255,0.1)]">
+      <div className="w-[50%] relative flex flex-col justify-center items-center ">
         <img
-          height={100}
-          width={100}
-          className="aboslute top-0 z-10"
+          height={80}
+          width={80}
+          className="absolute top-[-60px] z-10"
           src={hatImages[props.hatNumber - 1]}
           alt=""
         />
         <img
-          height={80}
-          width={80}
-          className="absolute top-10"
+          height={60}
+          width={60}
+          className="absolute top-[]  "
           src={faceImages[props.faceNumber - 1]}
           alt=""
         />
@@ -27,8 +27,8 @@ const PlayerScoreCard = (props) => {
           className="w-20 h-20 rounded-full"
         /> */}
       </div>
-      <div className="w-1/2">
-        <h2 className="text-2xl font-bold">{props.name}</h2>
+      <div className="w-[70%]">
+        <h2 className="text-xl font-bold">{props.name}</h2>
         <p>Score: {props.score}</p>
       </div>
     </div>
