@@ -98,7 +98,7 @@ const Lobby = () => {
         "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2-1",
         {
           headers: {
-            Authorization: `Bearer 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`,
+            Authorization: `Bearer ${process.env.REACT_APP_HUGGING_FACE_API_KEY}`,
           },
           method: "POST",
           body: JSON.stringify({ inputs: prompt }),
