@@ -1,6 +1,7 @@
 import React from "react";
 import { hatImages } from "../utils/images";
 import { faceImages } from "../utils/images";
+import { FaCrown } from "react-icons/fa";
 
 const PlayerScoreCard = (props) => {
   return (
@@ -27,10 +28,11 @@ const PlayerScoreCard = (props) => {
           className="w-20 h-20 rounded-full"
         /> */}
       </div>
-      <div className="w-[70%]">
+      <div className="w-[50%]">
         <h2 className="text-xl font-bold">{props.name}</h2>
         <p>Score: {props.score}</p>
       </div>
+      <div className="w-[20%]">{props.isOwner && <FaCrown className="text-2xl" />}</div>
     </div>
   );
 };

@@ -10,7 +10,9 @@ import { useLocation } from "react-router-dom";
 const Lobby = () => {
   const [prompt, setPrompt] = useState("");
   const [image, setImage] = useState("");
+  const [aiImage, setAiImage] = useState("");
   const [players, setPlayers] = useState([]);
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
@@ -33,10 +35,10 @@ const Lobby = () => {
   const getParitcipants = async () => {
     try {
       const response = await fetch(
-        `http://localhost:5000/getParitcipants?lobbyId=${lobbyId}`
+        `https://ap-south-1.aws.data.mongodb-api.com/app/data-ctbql/endpoint/get?lobbyId=${lobbyId}`
       );
       const data = await response.json();
-      setPlayers(data);
+      setPlayers(data.players);
       console.log(data);
     } catch (error) {
       console.error("error:" + error);
@@ -45,45 +47,67 @@ const Lobby = () => {
 
   const OPEN_AI_API_KEY = "";
 
+  // const createAIImage = async () => {
+  //   try {
+  //     const options = {
+  //       method: "POST",
+  //       headers: {
+  //         Authorization: `Bearer ${OPEN_AI_API_KEY}`,
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({
+  //         prompt: prompt,
+  //         n: 1,
+  //         response_format: "b64_json",
+  //       }),
+  //     };
+
+  //     const response = await fetch(
+  //       "https://api.openai.com/v1/images/generations",
+  //       options
+  //     );
+
+  //     const data = await response.json();
+  //     const generatedImageBase64 = data.data[0].b64_json;
+  //     setImage(`data:image/jpeg;base64,${generatedImageBase64}`);
+
+  //     const normalImageBase64 = normalImage.split(",")[1];
+  //     const serverResponse = await fetch("http://localhost:8080/", {
+  //       method: "POST",
+  //       headers: {
+  //         Accept: "application/json",
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({
+  //         aiImage: generatedImageBase64,
+  //         normalImage: normalImageBase64,
+  //       }),
+  //     });
+
+  //     const serverData = await serverResponse.json();
+  //     console.log(serverData);
+  //   } catch (error) {
+  //     console.error("error:" + error);
+  //   }
+  // };
+
   const createAIImage = async () => {
+    setIsSubmitted(true);
     try {
-      const options = {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${OPEN_AI_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          prompt: prompt,
-          n: 1,
-          response_format: "b64_json",
-        }),
-      };
-
       const response = await fetch(
-        "https://api.openai.com/v1/images/generations",
-        options
+        "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2-1",
+        {
+          headers: {
+            Authorization: `Bearer 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`,
+          },
+          method: "POST",
+          body: JSON.stringify({ inputs: prompt }),
+        }
       );
-
-      const data = await response.json();
-      const generatedImageBase64 = data.data[0].b64_json;
-      setImage(`data:image/jpeg;base64,${generatedImageBase64}`);
-
-      const normalImageBase64 = normalImage.split(",")[1];
-      const serverResponse = await fetch("http://localhost:8080/", {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          aiImage: generatedImageBase64,
-          normalImage: normalImageBase64,
-        }),
-      });
-
-      const serverData = await serverResponse.json();
-      console.log(serverData);
+      const result = await response.blob();
+      console.log(response);
+      setAiImage(URL.createObjectURL(result));
+      return result;
     } catch (error) {
       console.error("error:" + error);
     }
@@ -129,10 +153,12 @@ const Lobby = () => {
            overflow-y-auto gap-5
           "
           >
+            <p>Players Count: {players.length} / 4</p>
             {players.map((player) => {
               return (
                 <PlayerScoreCard
                   name={player.playerName}
+                  isOwner={player.isOwner}
                   score={player.score}
                   hatNumber={player.hatNumber}
                   faceNumber={player.faceNumber}
@@ -142,7 +168,14 @@ const Lobby = () => {
           </div>
 
           <div className="flex flex-col  h-full w-[70%] border border-white min-w-[320px] justify-center items-center ">
-            <img src={image} alt="" />
+            <div className="flex gap-10 mb-10">
+              <img src={image} height={250} width={250} alt="" />
+              {aiImage ? (
+                <img src={aiImage} height={250} width={250} alt="" />
+              ) : (
+                isSubmitted && <p>Loading...</p>
+              )}
+            </div>
             <p>
               Replicate this image by entering the AI image generation prompt
               ....
@@ -154,7 +187,7 @@ const Lobby = () => {
               placeholder="Enter the prompt"
               className="border border-black py-2 w-[50%] rounded-lg mt-5 text-black px-4 min-w-[300px]"
             />
-            <button onClick={sendAiImageToServer}>Submit</button>
+            <button onClick={createAIImage}>Submit</button>
           </div>
         </div>
       </div>
